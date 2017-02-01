@@ -11,10 +11,17 @@
 % Output: lam  - size of carrier wavelength in meters
 %              - scalar for GPS, Galileo, Beidou, array nx1 for GLONASS
 %
+% References: RINEX The Receiver Independent Exchange Format, Version 3.02
+%             IGS RINEX WG & RTCM-SC104. Table2 - Table 7
+%
 % Revision: 1.2.2017, Peter Spanik, email: spanikp@yahoo.com
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function lam = wavelength(GNSS, type, SV)
+
+if isempty(strfind('CLSD',type(1)))
+   error(['There is no ', type, ' measurement defined in RINEX !!!']); 
+end
 
 c = 2.99792458e8;
 switch GNSS
@@ -22,12 +29,23 @@ switch GNSS
     %%%%% GPS SYSTEM
     case 'G'
        switch type(2)
-           case '1'
-               f = 1575.42e6;   % GPS L1
-           case '2'
-               f = 1227.60e6;   % GPS L2
-           case '5'
-               f = 1176.45e6;   % GPS L5
+           case '1'   % GPS L1
+               if isempty(strfind('CSLXPWYMN',type(3))) || strcmp(type,'C1N')
+                  error(['There is no ', type, ' measurement defined in RINEX for GPS L1 band !!!']); 
+               end
+               f = 1575.42e6;
+               
+           case '2'   % GPS L2
+               if isempty(strfind('CDSLXPWYMN',type(3))) || strcmp(type,'C2N')
+                  error(['There is no ', type, ' measurement defined in RINEX for GPS L2 band !!!']); 
+               end
+               f = 1227.60e6;
+               
+           case '5'   % GPS L5
+               if isempty(strfind('IQX',type(3)))
+                  error(['There is no ', type, ' measurement defined in RINEX for GPS L5 band !!!']); 
+               end
+               f = 1176.45e6;
            otherwise
                error(['There is no ', type, ' measurement defined for GPS in RINEX !!!']);
        end  
@@ -42,14 +60,25 @@ switch GNSS
               1  -4   5   6   1  -4   5   6  -6  -7   0  -1  -2  -7   0  -1   4  -3   3   2   4  -3   3   2]; 
        
        switch type(2)
-           case '1'
-               f0 = 1602e6;      % GLONASS G1 (FDMA)
+           case '1'   % GLONASS G1 (FDMA)
+               if isempty(strfind('CP',type(3)))
+                  error(['There is no ', type, ' measurement defined in RINEX for GLONASS G1 band !!!']); 
+               end
+               f0 = 1602e6;
                Df = 562.5e3;
-           case '2'
-               f0 = 1246e6;      % GLONASS G2 (FDMA)
+               
+           case '2'   % GLONASS G2 (FDMA)
+               if isempty(strfind('CP',type(3)))
+                  error(['There is no ', type, ' measurement defined in RINEX for GLONASS G2 band !!!']); 
+               end
+               f0 = 1246e6;
                Df = 437.5e3;
-           case '3'        
-               f0 = 1202.025e6;  % GLONASS G3 (CDMA) 
+               
+           case '3'   % GLONASS G3 (CDMA) 
+               if isempty(strfind('IQX',type(3)))
+                  error(['There is no ', type, ' measurement defined in RINEX for GLONASS G3 band !!!']); 
+               end
+               f0 = 1202.025e6;
                Df = 0;
            otherwise
                error(['There is no ', type, ' measurement defined for GLONASS in RINEX !!!']);
@@ -65,16 +94,35 @@ switch GNSS
     %%%%% GALILEO SYSTEM   
     case 'E'
        switch type(2)
-           case '1'
-               f = 1575.420e6;   % GALILEO E1
-           case '5'
-               f = 1176.450e6;   % GALILEO E5a
-           case '7'
-               f = 1207.140e6;   % GALILEO E5b
-           case '8'
-               f = 1191.795e6;   % GALILEO E5 (E5a+E5b)
-           case '6'
-               f = 1278.750e6;   % GALILEO E6
+           case '1'   % GALILEO E1
+               if isempty(strfind('ABCXZ',type(3)))
+                  error(['There is no ', type, ' measurement defined in RINEX for Galileo E1 band !!!']); 
+               end
+               f = 1575.420e6;
+               
+           case '5'   % GALILEO E5a
+               if isempty(strfind('IQX',type(3)))
+                  error(['There is no ', type, ' measurement defined in RINEX for Galileo E5a band !!!']); 
+               end
+               f = 1176.450e6;
+               
+           case '7'   % GALILEO E5b
+               if isempty(strfind('IQX',type(3)))
+                  error(['There is no ', type, ' measurement defined in RINEX for Galileo E5b band !!!']); 
+               end
+               f = 1207.140e6;
+               
+           case '8'   % GALILEO E5 (E5a+E5b)
+               if isempty(strfind('IQX',type(3)))
+                  error(['There is no ', type, ' measurement defined in RINEX for Galileo E5(E5a+E5b) band !!!']); 
+               end
+               f = 1191.795e6;
+               
+           case '6'   % GALILEO E6
+               if isempty(strfind('ABCXZ',type(3)))
+                  error(['There is no ', type, ' measurement defined in RINEX for Galileo E6 band !!!']); 
+               end
+               f = 1278.750e6;
            otherwise
                error(['There is no ', type, ' measurement defined for Galileo in RINEX !!!']);
        end 
@@ -82,26 +130,73 @@ switch GNSS
     %%%%% BEIDOU SYSTEM   
     case 'C'
        switch type(2)
-           case '1'
-               f = 1561.098e6;   % BEIDOU B1
-           case '2'
-               f = 1207.140e6;   % BEIDOU B2
-           case '3'
-               f = 1268.520e6;   % BEIDOU B3
+           case '1'   % BEIDOU B1
+               if isempty(strfind('IQX',type(3)))
+                  error(['There is no ', type, ' measurement defined in RINEX for Beidou B1 band !!!']); 
+               end
+               f = 1561.098e6;
+               
+           case '2'   % BEIDOU B2
+               if isempty(strfind('IQX',type(3)))
+                  error(['There is no ', type, ' measurement defined in RINEX for Beidou B2 band !!!']); 
+               end
+               f = 1207.140e6;
+               
+           case '3'   % BEIDOU B3
+               if isempty(strfind('IQX',type(3)))
+                  error(['There is no ', type, ' measurement defined in RINEX for Beidou B3 band !!!']); 
+               end
+               f = 1268.520e6;
            otherwise
                error(['There is no ', type, ' measurement defined for Beidou in RINEX !!!']);
        end 
        
     %%%%% SBAS SYSTEM   
     case 'S'
-        
        switch type(2)
-           case '1'
-               f = 1575.42e6;    % L1
-           case '5'
-               f =  1176.45e6;   % L5
+           case '1'    % L1
+               if strcmp('C',type(3))
+                  error(['There is no ', type, ' measurement defined in RINEX for SBAS L1 band !!!']); 
+               end
+               f = 1575.42e6;
+               
+           case '5'   % L5
+               if isempty(strfind('IQX',type(3)))
+                  error(['There is no ', type, ' measurement defined in RINEX for SBAS L5 band !!!']); 
+               end
+               f =  1176.45e6;
            otherwise
                error(['There is no ', type, ' measurement defined for SBAS in RINEX !!!']);
+       end 
+
+    %%%%% QZSS SYSTEM   
+    case 'J'
+       switch type(2)
+           case '1'    % QZSS L1
+               if isempty(strfind('CSLXZ',type(3)))
+                  error(['There is no ', type, ' measurement defined in RINEX for QZSS L1 band !!!']); 
+               end
+               f = 1575.42e6;
+               
+           case '2'    % QZSS L2
+               if isempty(strfind('SLX',type(3)))
+                  error(['There is no ', type, ' measurement defined in RINEX for QZSS L2 band !!!']); 
+               end
+               f = 1227.60e6;
+               
+           case '5'   % QZSS L5
+               if isempty(strfind('IQX',type(3)))
+                  error(['There is no ', type, ' measurement defined in RINEX for QZSS L5 band !!!']); 
+               end
+               f =  1176.45e6;
+               
+           case '6'   % QZSS LEX(6)
+               if isempty(strfind('SLX',type(3)))
+                  error(['There is no ', type, ' measurement defined in RINEX for QZSS LEX(6) band !!!']); 
+               end
+               f =  1278.75e6;
+           otherwise
+               error(['There is no ', type, ' measurement defined for QZSS in RINEX !!!']);
        end 
        
     otherwise
