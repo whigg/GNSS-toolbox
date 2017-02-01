@@ -16,7 +16,7 @@
 
 function lam = wavelength(GNSS, type, SV)
 
-c = 299792458;
+c = 2.99792458e8;
 switch GNSS
     
     %%%%% GPS SYSTEM
