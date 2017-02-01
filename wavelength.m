@@ -15,11 +15,6 @@
 %             IGS RINEX WG & RTCM-SC104. Table2 - Table 7
 %
 % Revision: 1.2.2017, Peter Spanik, email: spanikp@yahoo.com
-<<<<<<< HEAD
-% Toto bude verzia pre workspace
-=======
-% Toto je verzia na remote repo.
->>>>>>> 3d473932e5c14d5ad590026dbfc78ac9510df4d7
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function lam = wavelength(GNSS, type, SV)
