@@ -11,7 +11,7 @@
 % Output: lam  - size of carrier wavelength in meters
 %              - scalar for GPS, Galileo, Beidou, array nx1 for GLONASS
 %
-% Revision: 1.2.2017, Peter Spanik
+% Revision: 1.2.2017, Peter Spanik, spanikp@yahoo.com
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function lam = wavelength(GNSS, type, SV)
