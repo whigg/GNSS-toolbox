@@ -21,6 +21,9 @@
 %       Sample ANTEX file is at Data/PCV
 %
 % Peter Spanik, 1.2.2017
+%
+% Updates: 15.2.2017 - Minor text typos fix
+% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function [APCoffset, PCVsatpos, PCV] = antenna_PCV(ANTEX, satpos, satsys, freq, fig, colorbar_range)
@@ -54,7 +57,6 @@ function [APCoffset, PCVsatpos, PCV] = antenna_PCV(ANTEX, satpos, satsys, freq, 
    %%%%% While loops to find right PCV table
    system = true;
    while system
-   
       stop = true;
       while stop
          line = fgetl(fid);
