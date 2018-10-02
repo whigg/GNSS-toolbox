@@ -12,8 +12,9 @@ function xtr2MPskyplot(xtrFileName, MPcode, saveFig, options)
 % Optional:
 % saveFig - true/false flag to export plots to PNG file (default: true)
 % options - {colorBarLimits, colorBarTicks, figureResolution}
-%         - default values: colorBarLimits = [0 120];
-%                           colorBarTicks = 0:20:120;
+%         - default values: colorBarLimits = [0 120]; % Range of colorbar
+%                           colorBarTicks = 0:20:120; % Ticks on colorbar 
+%                           figureResolution = '200'; % Output PNG resolution
 %
 % Requirements:
 % polarplot3d.m, findGNSTypes.m, dataCell2matrix.m, getNoSatZone.m
