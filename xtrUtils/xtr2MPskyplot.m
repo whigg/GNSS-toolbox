@@ -11,34 +11,42 @@ function xtr2MPskyplot(xtrFileName, MPcode, saveFig, options)
 %
 % Optional:
 % saveFig - true/false flag to export plots to PNG file (default: true)
-% options - {colorBarLimits, colorBarTicks, figureResolution}
-%         - default values: colorBarLimits = [0 120]; % Range of colorbar
-%                           colorBarTicks = 0:20:120; % Ticks on colorbar 
-%                           figureResolution = '200'; % Output PNG resolution
+% options - structure with the following settings:
+%      colorBarLimits = [0 120]; % Range of colorbar
+%      colorBarTicks = 0:20:120; % Ticks on colorbar 
+%      figResolution = '200';    % Output PNG resolution
+%      cutOffValue = 0;          % Value of elevation cutoff on skyplots
 %
 % Requirements:
 % polarplot3d.m, findGNSTypes.m, dataCell2matrix.m, getNoSatZone.m
 %
-% Peter Spanik, 14.9.2018
+% Peter Spanik, 7.10.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Close all opened figures
 close all
 
+% Default options
+opt = struct('colorBarLimits',[0, 120],...
+                    'colorBarTicks', 0:20:120,...
+                    'figResolution','200',...
+                    'cutOffValue',0);
+
 % Check input values
 if nargin == 2
    saveFig = true;
-   options = {[0, 120], 0:20:120, '200'};
+   options = opt;
    if ~ischar(xtrFileName) || ~ischar(MPcode)
       error('Inputs "xtrFileName" and "MPcode" have to be strings!') 
    end
-   %xtr2MPskyplot('wecafare-VISO.xtr','C1',false,{[0,150],0:50:150},'150')
+   
 elseif nargin == 3
     saveFig = logical(saveFig);
    if ~ischar(xtrFileName) || ~ischar(MPcode) || numel(saveFig) ~= 1 
       error('Inputs "xtrFileName","MPcode" have to be strings and "saveFig" has to be single value!') 
    end
-   options = {[0, 120], 0:20:120, '200'};
+   options = opt;
+
 elseif nargin == 4
    if numel(options) ~= 3
       error('Input variable "limAndTicks" have to be cell of the following form {[1x2 array], [1xn array], [1xn char]}!') 
@@ -128,10 +136,14 @@ for i = 1:length(GNScell)
     MP.(GNScell{i}).vector = MP.(GNScell{i}).vals(sel);
     
     % Interpolate to regular grid
-    [azig, eleg] = meshgrid(0:3:357, 0:3:90);
+    aziBins = 0:3:360;
+    eleBins = 0:3:90;
+    [azig, eleg] = meshgrid(aziBins, eleBins);
     F = scatteredInterpolant(AZI.(GNScell{i}).vector,ELE.(GNScell{i}).vector,MP.(GNScell{i}).vector,'linear','none');
+    visibleBins = getVisibilityMask(AZI.(GNScell{i}).vector,ELE.(GNScell{i}).vector,[3, 3],options.cutOffValue);
     mpg = F(azig,eleg);
     mpg(isnan(mpg)) = -1;
+    mpg(~visibleBins) = -1;
     
     % Determine noSatZone bins
     [x_edge,y_edge] = getNoSatZone(GNScell{i},pos);
@@ -147,17 +159,17 @@ for i = 1:length(GNScell)
     
     colormap(myColorMap)
     c = colorbar;
-    colLimits = options{1};
+    colLimits = options.colorBarLimits;
     colLimits(1) = colLimits(1) + 5;
     c.Limits = colLimits;
-    c.Ticks = options{2};
+    c.Ticks = options.colorBarTicks;
     c.Position = [c.Position(1)*1.02, c.Position(2)*1.4, 0.8*c.Position(3), c.Position(4)*0.9];
     c.TickDirection = 'in';
     c.LineWidth = 1.1;
     c.FontSize = 10;
     % Transforming common values to vectors
     
-    caxis(options{1})
+    caxis(options.colorBarLimits)
     ylabel(c,sprintf('%s RMS MP%s value (cm)',GNScell{i},MPcode),'fontsize',10,'fontname','arial')
     axis equal
     axis tight
@@ -170,6 +182,6 @@ for i = 1:length(GNScell)
     if saveFig == true
        splittedInputName = strsplit(xtrFileName,'.');  
        figName = [splittedInputName{1}, '_', GNScell{i}, '_MP', MPcode];
-       print(figName,'-dpng',sprintf('-r%s',options{3}))
+       print(figName,'-dpng',sprintf('-r%s',options.figResolution))
     end
 end
