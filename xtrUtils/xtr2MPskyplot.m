@@ -87,6 +87,16 @@ for i = 1:length(GNScell)
     AZI.(GNScell{i}).vals = dataMatrix;
     sel2 = ~isnan(dataMatrix);
     
+    % Check ELE and AZI size
+    if size(sel1) == size(sel2)
+       % Get timestamps
+       if all(ELE.(GNScell{i}).time == AZI.(GNScell{i}).time)
+          timeStampsUni = timeStamp;
+       end
+    else
+       error('Reading ELE and AZI failed, not equal number of ELE and AZI epochs!')
+    end
+    
     % Multipath loading
     selMP_GNS = cellfun(@(c) strcmp([' ', GNScell{i}, 'M', MPcode], c(1:7)), data);
     if nnz(selMP_GNS) == 0
@@ -97,9 +107,21 @@ for i = 1:length(GNScell)
     [timeStamp, meanVal, dataMatrix] = dataCell2matrix(dataCell);
     MP.(GNScell{i}).time = timeStamp;
     MP.(GNScell{i}).meanVals = meanVal;
+    if size(dataMatrix,1) ~= size(sel1,1)
+        % Find indices logical indices of not missing values
+        idxNotMissing = ismember(timeStampsUni,timeStamp);
+        
+        % Alocate new array of values with correct dimensions
+        newdataMatrix = nan(numel(timeStampsUni),size(dataMatrix,2));
+        
+        % Assign not missing values from old array to new one
+        newdataMatrix(idxNotMissing,:) = dataMatrix;
+        dataMatrix = newdataMatrix;
+    end
+    
     MP.(GNScell{i}).vals = dataMatrix;
     sel3 = ~isnan(dataMatrix);
-    
+
     sel = sel1 & sel2 & sel3;
     ELE.(GNScell{i}).vector = ELE.(GNScell{i}).vals(sel);
     AZI.(GNScell{i}).vector = AZI.(GNScell{i}).vals(sel);
