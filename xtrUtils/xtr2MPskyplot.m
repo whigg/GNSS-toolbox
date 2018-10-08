@@ -15,6 +15,7 @@ function xtr2MPskyplot(xtrFileName, MPcode, saveFig, options)
 %      colorBarLimits = [0 120]; % Range of colorbar
 %      colorBarTicks = 0:20:120; % Ticks on colorbar 
 %      figResolution = '200';    % Output PNG resolution
+%      getMaskFromData = false;   % Derive terrain mask from available data
 %      cutOffValue = 0;          % Value of elevation cutoff on skyplots
 %
 % Requirements:
@@ -30,6 +31,7 @@ close all
 opt = struct('colorBarLimits',[0, 120],...
                     'colorBarTicks', 0:20:120,...
                     'figResolution','200',...
+                    'getMaskFromData', false,...
                     'cutOffValue',0);
 
 % Check input values
@@ -140,10 +142,15 @@ for i = 1:length(GNScell)
     eleBins = 0:3:90;
     [azig, eleg] = meshgrid(aziBins, eleBins);
     F = scatteredInterpolant(AZI.(GNScell{i}).vector,ELE.(GNScell{i}).vector,MP.(GNScell{i}).vector,'linear','none');
-    visibleBins = getVisibilityMask(AZI.(GNScell{i}).vector,ELE.(GNScell{i}).vector,[3, 3],options.cutOffValue);
+    
     mpg = F(azig,eleg);
     mpg(isnan(mpg)) = -1;
-    mpg(~visibleBins) = -1;
+    
+    % Check for useDataMasking settings
+    if options.getMaskFromData
+        visibleBins = getVisibilityMask(AZI.(GNScell{i}).vector,ELE.(GNScell{i}).vector,[3, 3],options.cutOffValue);
+        mpg(~visibleBins) = -1;
+    end
     
     % Determine noSatZone bins
     [x_edge,y_edge] = getNoSatZone(GNScell{i},pos);
