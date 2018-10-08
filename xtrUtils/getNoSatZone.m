@@ -1,5 +1,19 @@
 function [x_edge,y_edge] = getNoSatZone(GNSS,pos)
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Function to get boundary of "satellite hole" in planar cartesian
+% coordinates used for plotting. Boundary is relative to diameter of
+% plotting area R = 100, which representing elevation range 90 degrees.
+%
+% Input:
+% GNSS - satellite system identificator, one of 'GPS', 'GAL', 'BDS', 'GLO'
+% pos - approximate ECEF position in meters
+%
+% Output:
+% [x_edge,y_edge] - planar cartesian coordinates of satellite hole.
+%                 - full elevation range (90 degrees) represent radius 100 
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 deg = pi/180;
 DELTA = (0:1:359)*deg;
@@ -47,7 +61,6 @@ for i = 1:length(y_edge)
         y_edge(i) = 94*cos(azimuth(i)*deg);
     end
 end
-
 
 %figure
 %plot(x_edge,y_edge)

@@ -167,7 +167,6 @@ for i = 1:length(GNScell)
     c.TickDirection = 'in';
     c.LineWidth = 1.1;
     c.FontSize = 10;
-    % Transforming common values to vectors
     
     caxis(options.colorBarLimits)
     ylabel(c,sprintf('%s RMS MP%s value (cm)',GNScell{i},MPcode),'fontsize',10,'fontname','arial')
